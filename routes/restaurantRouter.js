@@ -118,6 +118,23 @@ restaurantRouter
     res.status(200).json({ success: true });
   });
 
+restaurantRouter.route('/searchrestaurant').post(async(req,res,next)=>{
+  const {search}=req.body;
+  console.log(search)
+  try{
+    const restaurants=await Restaurant.find({
+      $or:[{
+        name:{$regex:search,$options:"i"}
+     
+      },{   'menu.dishes.dishName':{$regex:search,$options:"i"}}]
+    },{name:1,delivery:1,dinein:1,address:1,photos:1})
+    return res.status(200).json({success:true,data:restaurants})
+  }
+  catch(error){
+    return res.status(500).json({success:false,error:"some error occured"})
+  }
+ 
+})
 restaurantRouter.route("/error").get((req, res, next) => {
   error = new Error("Error found in the code");
   error.status = 404;
